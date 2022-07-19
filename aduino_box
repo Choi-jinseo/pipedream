@@ -1,0 +1,72 @@
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+#include <Servo.h>
+
+LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+Servo servo;
+
+int servoPin = 9;
+int angle = 0;
+
+int hour=0, minute=0, second=0;   // 시, 분, 초
+int day=0;    // day
+char ch = ':';
+
+void setup()
+{
+  servo.attach(servoPin);
+  
+  Serial.begin(9600);
+  lcd.init();                      // initialize the lcd 
+  lcd.init();
+  // Print a message to the LCD.
+  lcd.backlight();
+  lcd.setCursor(0,0);
+  lcd.print("Do you want to lock box?");
+  delay(6000);
+  for(angle = 0; angle < 180; angle++) 
+  { 
+    servo.write(angle); 
+    delay(15); 
+  } 
+  
+    lcd.clear();
+}
+
+
+void loop() {
+  lcd.setCursor(0, 0);      // 0번째줄, 0번째열로 커서 이동
+  lcd.print("abandoned time");
+  lcd.setCursor(0, 1);      // 1번째줄, 0번째열로 커서 이동
+  lcd.print("Time:: ");
+  lcd.print(hour);    // 시
+  lcd.print(ch);
+  lcd.print(minute);  // 분
+  lcd.print(ch);
+  lcd.print(second);  // 초
+  second++;
+  delay(1000);
+  
+  if(second == 60)        // 60초가 되었을때
+  { 
+    second = 0;           // 초 초기화
+    minute = minute + 1;  // 분 +1
+    lcd.clear();
+  }
+  if(minute == 60)  // 60분, 60초가 되었을때
+  {
+    minute = 0;       // 초 초기화
+    hour = hour + 1;  // 시 +1
+    lcd.clear();
+  }
+  if(hour == 24)  // 24시 되었을때
+  {
+    hour = 0;     // 시 초기화
+    day++;        // 하루 지남
+    lcd.clear();
+    lcd.print(day);
+    lcd.print("Day");
+    delay(5000);
+    
+  }
+}
